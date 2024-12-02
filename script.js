@@ -12,6 +12,7 @@ const quizWord = document.getElementById("quizWord");
 const answerInput = document.getElementById("answerInput");
 const checkAnswerButton = document.getElementById("checkAnswerButton");
 const feedback = document.getElementById("feedback");
+const exitQuizButton = document.getElementById("exitQuizButton");
 
 let currentWord = null;
 let score = 0;
@@ -75,6 +76,22 @@ checkAnswerButton.addEventListener("click", () => {
         setTimeout(loadNextWord, 2000); // Carica la prossima parola dopo 2 secondi
     }
 });
+
+// Funzione per uscire dal quiz
+exitQuizButton.addEventListener("click", () => {
+    quizSection.classList.add("hidden"); // Nasconde la sezione del quiz
+    addWordsSection.classList.remove("hidden"); // Mostra la schermata principale
+    resetQuiz(); // Reimposta il quiz
+});
+
+// Funzione per resettare il quiz
+function resetQuiz() {
+    currentWord = null;
+    score = 0;
+    attempts = 0;
+    feedback.textContent = "";
+    checkAnswerButton.disabled = false;
+}
 
 // Salva le parole in LocalStorage
 function saveToLocalStorage() {

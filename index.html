@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German Vocabulary App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .hidden {
+            display: none;
+        }
+        .feedback {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>German Vocabulary Trainer</h1>
+
+        <!-- Schermata principale -->
+        <div id="addWordsSection">
+            <h2>Aggiungi Parole</h2>
+            <input id="wordInput" type="text" placeholder="Parola in Tedesco">
+            <input id="translationInput" type="text" placeholder="Traduzione">
+            <button id="addWordButton">Add Word</button>
+            <button id="startQuizButton">Start Quiz</button>
+            <button onclick="clearLocalStorage()">Delate all</button>
+        </div>
+
+        <!-- Modalità quiz -->
+        <div id="quizSection" class="hidden">
+            <h2>Translate Word</h2>
+            <p id="quizWord"></p>
+            <input id="answerInput" type="text" placeholder="Write your translation">
+            <button id="checkAnswerButton">Check Answer</button>
+            <p id="feedback" class="feedback"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

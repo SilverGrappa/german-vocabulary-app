@@ -1,5 +1,9 @@
 // Recupera le parole salvate da LocalStorage all'avvio
 const wordList = JSON.parse(localStorage.getItem("wordList")) || {};
+// Elementi HTML per esportazione/importazione
+const exportButton = document.getElementById("exportButton");
+const importFileInput = document.getElementById("importFileInput");
+const importButton = document.getElementById("importButton");
 
 // Elementi HTML
 const addWordsSection = document.getElementById("addWordsSection");
@@ -13,6 +17,8 @@ const answerInput = document.getElementById("answerInput");
 const checkAnswerButton = document.getElementById("checkAnswerButton");
 const feedback = document.getElementById("feedback");
 const exitQuizButton = document.getElementById("exitQuizButton");
+const startReverseQuizButton = document.getElementById("startReverseQuizButton");
+let isReverseQuiz = false;
 
 let currentWord = null;
 let score = 0;
@@ -93,10 +99,107 @@ function resetQuiz() {
     checkAnswerButton.disabled = false;
 }
 
+// Avvia il quiz inverso
+startReverseQuizButton.addEventListener("click", () => {
+    if (Object.keys(wordList).length === 0) {
+        alert("Aggiungi almeno una parola per iniziare il quiz!");
+        return;
+    }
+
+    isReverseQuiz = true;
+    addWordsSection.classList.add("hidden");
+    quizSection.classList.remove("hidden");
+    loadNextWord();
+});
+
+// Modifica la funzione per caricare le parole in base alla modalità
+function loadNextWord() {
+    const words = Object.keys(wordList);
+    currentWord = words[Math.floor(Math.random() * words.length)];
+
+    if (isReverseQuiz) {
+        quizWord.textContent = `Traduzione: ${wordList[currentWord]}`;
+    } else {
+        quizWord.textContent = `Traduci: ${currentWord}`;
+    }
+
+    answerInput.value = "";
+    feedback.textContent = "";
+}
+
+// Modifica la funzione di verifica della risposta
+checkAnswerButton.addEventListener("click", () => {
+    const userAnswer = answerInput.value.trim();
+
+    const correctAnswer = isReverseQuiz
+        ? currentWord
+        : wordList[currentWord];
+
+    if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        feedback.textContent = `Corretto! La risposta è "${correctAnswer}"`;
+        feedback.style.color = "green";
+        score++;
+    } else {
+        feedback.textContent = `Sbagliato! La risposta corretta è "${correctAnswer}"`;
+        feedback.style.color = "red";
+    }
+
+    attempts++;
+    if (attempts >= Object.keys(wordList).length) {
+        feedback.textContent += `\nQuiz terminato! Punteggio: ${score}/${Object.keys(wordList).length}`;
+        checkAnswerButton.disabled = true;
+    } else {
+        setTimeout(loadNextWord, 2000); // Carica la prossima parola dopo 2 secondi
+    }
+});
+
+// Reimposta la modalità quiz quando si esce
+exitQuizButton.addEventListener("click", () => {
+    quizSection.classList.add("hidden");
+    addWordsSection.classList.remove("hidden");
+    resetQuiz();
+    isReverseQuiz = false; // Torna alla modalità normale
+});
+
 // Salva le parole in LocalStorage
 function saveToLocalStorage() {
     localStorage.setItem("wordList", JSON.stringify(wordList));
 }
+
+// Funzione per esportare le parole in un file JSON
+exportButton.addEventListener("click", () => {
+    const data = JSON.stringify(wordList, null, 2); // Converte l'oggetto wordList in JSON
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "wordList.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+
+// Funzione per importare parole da un file JSON
+importButton.addEventListener("click", () => {
+    const file = importFileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                Object.assign(wordList, importedData); // Unisce i dati importati a quelli esistenti
+                saveToLocalStorage();
+                alert("Words successfully imported!");
+            } catch (error) {
+                alert("Error: invalid file(should be a json!).");
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert("Select a file.");
+    }
+});
 
 // Funzione opzionale per reimpostare i dati (aggiungi un pulsante nel tuo HTML se serve)
 function clearLocalStorage() {
